@@ -1,0 +1,97 @@
+207. Course Schedule
+
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. 
+You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+
+For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return true if you can finish all courses. Otherwise, return false
+
+CODE: USING DFS
+class Solution {
+public:
+    bool DFS(unordered_map<int, vector<int>>& adj, int u, vector<bool>& vis,
+             vector<bool>& inRec) {
+        // if(vis[u]==true){
+        //     return ;
+        // }
+        vis[u] = true;
+        inRec[u] = true;
+        for (int& v : adj[u]) {
+            if (!vis[v] && DFS(adj, v, vis, inRec)) {
+                return true;
+            } else if (inRec[v] == true) {
+                return true;
+            }
+        }
+        inRec[u] = false;
+        return false;
+    }
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        int n = prerequisites.size();
+        unordered_map<int, vector<int>> adj;
+        for (int i = 0; i < n; i++) {
+            int u = prerequisites[i][0];
+            int v = prerequisites[i][1];
+            adj[v].push_back(u);
+        }
+        if (prerequisites.empty()) {
+            return true;
+        }
+        vector<bool> visited(numCourses, false);
+        vector<bool> inRec(numCourses, false);
+        for (int i = 0; i < numCourses; i++) {
+            if (!visited[i] && DFS(adj, i, visited, inRec)) {
+                return false; // cycle detect means no course scduled
+            }
+        }
+        return true; // No cycle,all course can be finsihed
+    }
+};
+
+
+USING BFS
+class Solution {
+public:
+    // Using BFS
+
+    bool BFS(unordered_map<int, vector<int>>& adj, int n, vector<int>& indeg) {
+        queue<int> q;
+        int cnt = 0;
+        for (int i = 0; i < n; i++) {
+            if (indeg[i] == 0) {
+                cnt++;
+                q.push(i);
+            }
+        }
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (int& v : adj[u]) {
+                indeg[v]--;
+                if (indeg[v] == 0) {
+                    cnt++;
+                    q.push(v);
+                }
+            }
+        }
+        if (cnt == n) { // i am able to finsih all courses
+            return true;
+        }
+        return false;
+    }
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        // Method-1 Using DFS
+        // Method-2 Using BFS
+
+        int n = prerequisites.size();
+        unordered_map<int, vector<int>> adj;
+           vector<int> indeg(numCourses, 0);
+        for (int i = 0; i < n; i++) {
+            int u = prerequisites[i][0];
+            int v = prerequisites[i][1];
+            adj[v].push_back(u);
+            indeg[u]++;
+        }
+        return BFS(adj, numCourses, indeg);
+    }
+};
