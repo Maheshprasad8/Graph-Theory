@@ -1,0 +1,86 @@
+547. Number of Provinces
+There are n cities. Some of them are connected, while some are not. If city a is connected directly with city b, and city b is connected directly with city c, then city a is connected indirectly with city c.
+A province is a group of directly or indirectly connected cities and no other cities outside of the group.
+You are given an n x n matrix isConnected where isConnected[i][j] = 1 if the ith city and the jth city are directly connected, and isConnected[i][j] = 0 otherwise.
+Return the total number of provinces.
+
+Code:
+USING DFS
+class Solution {
+public:
+    int DFS(unordered_map<int, vector<int>>& adj, int u, vector<bool>& vis) {
+        int cnt = 0;
+        vis[u] = true;
+        for (int& v : adj[u]) {
+            if (!vis[v]) {
+                DFS(adj, v, vis);
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        unordered_map<int, vector<int>> adj;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (isConnected[i][j] == 1) {
+                    adj[i].push_back(j);
+                    adj[j].push_back(i);
+                }
+            }
+        }
+        // int n=isConnected.size();
+        int cnt = 0;
+        vector<bool> vis(n, false);
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                DFS(adj, i, vis);
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+};
+
+//Using BFS
+
+
+class Solution {
+public:
+    void BFS(unordered_map<int, vector<int>>& adj, int u, vector<bool>& vis) {
+        queue<int> q;
+        q.push(u);
+        vis[u] = true;
+        while (!q.empty()) {
+            int temp = q.front();
+            q.pop();
+            for (int& v : adj[temp]) {
+                if (!vis[v]) {
+                    BFS(adj, v, vis);
+                }
+            }
+        }
+    }
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        unordered_map<int,vector<int>>adj;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (isConnected[i][j] == 1) {
+                    adj[i].push_back(j);
+                    adj[j].push_back(i);
+                }
+            }
+        }
+        int cnt = 0;
+        vector<bool> vis(n, false);
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                BFS(adj, i, vis);
+                cnt++;
+            }
+        }
+        return cnt;
+    }
+};
