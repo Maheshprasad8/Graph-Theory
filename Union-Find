@@ -1,0 +1,45 @@
+This problem is to implement disjoint set union. There will be 2 incomplete functions namely union and find. You have to complete these functions. 
+
+Union: Join two subsets into a single set.
+isConnected: Determine which subset a particular element is in. This can be used for determining if two elements are in same subset.
+
+............................................................................................................................
+
+
+
+class Solution
+{
+    public:
+    //Function to merge two nodes a and b.
+    // vecto
+    int find(int i,int parent[]){
+        if(i==parent[i]){
+            return i;
+        }
+        return parent[i]=find(parent[i],parent);
+    }
+    void union_( int a, int b, int parent[], int rank1[]) 
+    {
+       int x_parent=find(a,parent);
+       int y_parent=find(b,parent);
+       if(x_parent==y_parent){
+           return;
+       }
+       if(rank1[x_parent]>rank1[y_parent]){
+           parent[y_parent]=x_parent;
+       }
+       else if(rank1[x_parent]<rank1[y_parent]){
+           parent[x_parent]=y_parent;
+       }
+       else{
+           parent[x_parent]=y_parent;
+           rank1[y_parent]++;
+       }
+    }
+    
+    //Function to check whether 2 nodes are connected or not.
+    bool isConnected(int x,int y, int parent[], int rank1[])
+    {
+      return find(x, parent) == find(y, parent);
+    }
+}
