@@ -1,0 +1,30 @@
+.........Code of find and Union using path compression and rank...............
+
+vector<int>parent;
+vector<int>rank;
+int find(int x){
+    if(x==parent[x]){
+        return x;
+    }
+    return parent[x]=find(parent[x]);
+}
+
+void Union(int x,int y){
+    int x_parent=find(x);
+    int y_parent=find(y);
+    if(x_parent==y_parent){
+        return;
+    }
+    // jo bada usko parent bna do
+    if(rank[x_parent]<y_parent){
+        parent[x_parent]=y_parent;
+    }
+    else if(rank[x_parent]>y_parent){
+        parent[y_parent]=x_parent;
+    }
+    else{
+        // kisi ko bhi parnet bna do agar rank equal hai
+        parent[x_parent]=y_parent;
+        rank[y_parent]++;
+    }
+}
