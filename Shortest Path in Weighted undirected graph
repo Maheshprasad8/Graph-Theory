@@ -1,0 +1,78 @@
+You are given a weighted undirected graph having n vertices numbered from 1 to n and m edges along with their weights.
+Find the shortest weight path between the vertex 1 and the vertex n,  if there exists a path, 
+and return a list of integers whose first element is the weight of the path, and the rest consist of the nodes on that path.
+If no path exists, then return a list containing a single element -1.
+
+The input list of edges is as follows - {a, b, w}, denoting there is an edge between a and b, and w is the weight of that edge.
+
+Note: The driver code here will first check if the weight of the path returned is equal to the sum of the weights along the nodes on that path,
+if equal it will output the weight of the path, else -2. In case the list contains only a single element (-1) it will simply output -1. 
+
+
+.............................Dijsktra Algo....................
+
+class Solution {
+  public:
+    vector<int> shortestPath(int n, int m, vector<vector<int>>& edges) {
+    //   adjacenct list 
+    unordered_map<int,vector<pair<int,int>>>adj;
+    for(int i=0;i<edges.size();i++){
+        int u=edges[i][0];
+        int v=edges[i][1];
+        int w=edges[i][2];
+        adj[u].push_back({v,w});
+        adj[v].push_back({u,w});
+    }
+    //  for(auto &vec : edges) {
+    //         int u = vec[0];
+    //         int v = vec[1];
+    //         int w = vec[2];
+            
+    //         adj[u].push_back({v, w});
+    //         adj[v].push_back({u, w});
+    //     }
+    priority_queue<pair<int,int>,vector<pair<int,int>>,
+    greater<pair<int,int>>>minHeap;
+    vector<int>res(n+1,INT_MAX);
+    vector<int>parent(n+1);
+    for(int i=1;i<=n;i++){
+        parent[i]=i;
+    }
+    res[1]=0;
+    minHeap.push({0,1});
+    
+    while(!minHeap.empty()){
+        int d=minHeap.top().first;
+        int node=minHeap.top().second;
+        minHeap.pop();
+        for(auto &it:adj[node]){
+            int adjNode=it.first;
+            int dist=it.second;
+            if(d+dist<res[adjNode]){
+                res[adjNode]=d+dist;
+                minHeap.push({d+dist,adjNode});
+                parent[adjNode]=node;
+                
+            }
+        }
+    }
+    vector<int>path;
+    int destnode=n;
+    if(res[destnode]==INT_MAX){
+        return{-1};
+    }
+    
+    while(parent[destnode]!=destnode){
+        path.push_back(destnode);
+        destnode=parent[destnode];
+        
+    }
+    path.push_back(1);
+    reverse(path.begin(),path.end());
+    // total weight insert mat krna bhulna h
+      path.insert(path.begin(), res[n]);
+        // return path;
+    return path;
+    }
+};
+
