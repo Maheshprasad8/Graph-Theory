@@ -5,7 +5,7 @@ You have to find the shortest distance of all the vertices from the source verte
 and return a list of integers denoting the shortest distance between each node and source vertex src.
 
 Note: The Graph doesn't contain any negative weight edge.
-
+.........................BY PRIORTY QUEUE(MINHEAP)....................................
 class Solution {
   public:
     // Function to find the shortest distance of all the vertices
@@ -32,3 +32,37 @@ class Solution {
         return res;
     }
 };
+
+
+.............................BY SET..............................................WHY.............................BECAUSE ERASE FACILITY.............................
+class Solution {
+  public:
+    // Function to find the shortest distance of all the vertices
+    // from the source vertex src.
+    vector<int> dijkstra(vector<vector<pair<int, int>>> &adj, int src) {
+       vector<int>res(adj.size(),INT_MAX);
+       set<pair<int,int>>st;
+       res[src]=0;
+       st.insert({0,src});
+       while(!st.empty()){
+           auto &it=*st.begin();
+           int d=it.first;
+           int node=it.second;
+          st.erase(it);
+          for(auto &vec:adj[node]){
+              int adjNode=vec.first;
+              int wt=vec.second;
+              if(d+wt<res[adjNode]){
+                  if(res[adjNode]!=INT_MAX){
+                      st.erase({res[adjNode],adjNode});
+                      
+                  }
+                  res[adjNode]=d+wt;
+                  st.insert({d+wt,adjNode});
+              }
+          }
+       }
+       return res;
+    }
+};
+
