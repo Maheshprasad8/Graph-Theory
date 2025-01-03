@@ -1,0 +1,39 @@
+Given a weighted, undirected, and connected graph with V vertices and E edges, 
+your task is to find the sum of the weights of the edges in the Minimum Spanning Tree (MST) of the graph. 
+The graph is represented by an adjacency list, where each element adj[i] is a vector containing vector of integers. Each vector represents an edge, 
+with the first integer denoting the endpoint of the edge and the second integer denoting the weight of the edge.
+....................................................................................................
+DS-MINHEAP
+PUT IN DS-{weight,node,parent}
+
+class Solution {
+  public:
+  typedef pair<int,int>P;
+    // Function to find sum of weights of edges of the Minimum Spanning Tree.
+    int spanningTree(int V, vector<vector<int>> adj[]) {
+     priority_queue<P,vector<P>,greater<P>>minHeap;
+     minHeap.push({0,0});
+     vector<bool>inMST(V,false);
+     int sum=0;
+     while(!minHeap.empty()){
+         auto p=minHeap.top();
+         minHeap.pop();
+         int wt=p.first;
+         int node=p.second;
+         if(inMST[node]==true){
+             continue;
+         }
+         inMST[node]=true;
+         sum+=wt;
+         for(auto &temp:adj[node]){
+             int nbr=temp[0];
+             int nbr_wt=temp[1];
+             
+             if(!inMST[nbr]){
+                 minHeap.push({nbr_wt,nbr});
+             }
+         }
+     }
+     return sum;
+    }
+};
