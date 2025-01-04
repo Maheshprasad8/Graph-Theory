@@ -1,0 +1,72 @@
+You are given a positive integer n representing n cities numbered from 1 to n.
+You are also given a 2D array roads where roads[i] = [ai, bi, distancei] indicates that 
+there is a bidirectional road between cities ai and bi with a distance equal to distancei. 
+The cities graph is not necessarily connected.
+
+The score of a path between two cities is defined as the minimum distance of a road in this path.
+
+Return the minimum possible score of a path between cities 1 and n.
+
+Note:
+
+A path is a sequence of roads between two cities.
+It is allowed for a path to contain the same road multiple times, and you can visit cities 1 and n multiple times along the path.
+The test cases are generated such that there is at least one path between 1 and n.
+
+
+..............................Solved by DFS && BFS...............................................................
+
+
+class Solution {
+public:
+typedef pair<int, int> P;
+    // void dfs(int u, unordered_map<int, vector<P>>& adj, vector<bool>& vis,
+    //          int &res) {
+    //     vis[u] = true;
+    //     for (auto& vec : adj[u]) {
+    //         int v = vec.first;
+    //         int d = vec.second;
+    //         res = min(res, d);
+    //         if (!vis[v]) {
+    //             dfs(v, adj, vis, res);
+    //         }
+    //     }
+    // }
+    int minScore(int n, vector<vector<int>>& roads) {
+        unordered_map<int, vector<P>> adj;
+        for (int i = 0; i < roads.size(); i++) {
+            int u = roads[i][0];
+            int v = roads[i][1];
+            int wt = roads[i][2];
+            adj[u].push_back({v, wt});
+            adj[v].push_back({u, wt});
+        }
+        // vector<bool> vis(n+1, false);
+        // int res = INT_MAX;
+
+        // dfs(1, adj, vis, res);
+        // return res;
+
+        // BFS method 
+        int res=INT_MAX;
+        vector<bool>vis(n+1,false);
+        queue<int>q;
+        q.push(1);
+        vis[1]=true;
+         while(!q.empty()){
+            int u=q.front();
+            q.pop();
+            for(auto &temp:adj[u]){
+            int v=temp.first;
+            int wt=temp.second;
+            res=min(res,wt);
+            if(!vis[v]){
+                vis[v]=true;
+                q.push(v);
+            }
+         }
+         }
+         return res;
+    }
+
+};
