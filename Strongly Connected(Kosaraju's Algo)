@@ -1,0 +1,66 @@
+Given an adjacency matrix, adj of Directed Graph, Find the number of strongly connected components in the graph.
+
+
+step-1 -> topological sort in stack
+step-1->revserse all edges
+step-3->dfs call in stack
+
+....................KOSARAJU'S ALGORITHM......................
+
+class Solution {
+  public:
+  void dfsfill(int u,vector<vector<int>>&adj,vector<bool>&vis,stack<int>&st){
+     vis[u]=true;
+     for(int &v:adj[u]){
+         if(!vis[v]){
+             dfsfill(v,adj,vis,st);
+         }
+     }
+     st.push(u);
+  }
+  
+  
+  void dfsTraversal(int node,vector<vector<int>>&adjReverse,vector<bool>&vis){
+      vis[node]=true;
+      for(int &v:adjReverse[node]){
+          if(!vis[v]){
+              dfsTraversal(v,adjReverse,vis);
+          }
+      }
+  }
+    int kosaraju(vector<vector<int>> &adj) {
+     
+    //  step-1 topological sort
+    int V=adj.size();
+    stack<int>st;
+    vector<bool>vis(V,false);
+    for(int i=0;i<V;i++){
+        if(!vis[i]){
+            dfsfill(i,adj,vis,st);
+        }
+    }
+    //  step-2 make a reverse graph
+    
+    vector<vector<int>>adjReverse(V);
+    for(int u=0;u<V;u++){
+        for(int &v:adj[u]){
+            // u->v
+            // but v->u chaiye
+            adjReverse[v].push_back(u);
+        }
+    }
+    
+    // step-3  stack ke order mai dfs
+    int countSCC=0;
+   vector<bool>visited(V,false);
+    while(!st.empty()){
+       int node=st.top();
+       st.pop();
+       if(!visited[node]){
+            dfsTraversal(node,adjReverse,visited);
+            countSCC++;
+       }        
+    }
+    return countSCC;
+    }
+};
