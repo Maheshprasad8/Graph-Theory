@@ -1,0 +1,64 @@
+
+An Eulerian Path is a path in graph that visits every edge exactly once. An Eulerian Circuit is an Eulerian Path which starts and ends on the same vertex.
+Given an undirected connected graph with V nodes, and E edges, with adjacency list adj, return 2 if the graph contains an eulerian circuit, 
+else if the graph contains an eulerian path, return 1, otherwise, return 0
+
+
+...............................................................
+isConnected()
+oddDegree>2 none
+oddDegree==2 EP
+oddDeg==0 EC
+..................................................................................
+class Solution {
+public:
+void DFS(vector<int>adj[],int u,vector<bool>&visited){
+    visited[u]=true;
+    for(auto it=adj[u].begin();it!=adj[u].end();it++){
+       int nbr=*it;
+        if(!visited[nbr]){
+           DFS(adj,nbr,visited); 
+        }
+    }
+}
+bool isconnected(int V,vector<int>adj[]){
+    int nonzerodeg=-1;
+    for(int i=0;i<V;i++){
+        if(adj[i].size()!=0){
+            nonzerodeg=i;
+            break;
+        }
+    }
+    vector<bool>visited(V,false);
+    DFS(adj,nonzerodeg,visited);
+    
+    for(int i=0;i<V;i++){
+        if(visited[i]==false && adj[i].size()>0){
+            return false;
+        }
+    }
+    return true;
+}
+
+
+	int isEulerCircuit(int V, vector<int>adj[]){
+	   
+	   if(isconnected(V,adj)==false){
+	       return 0;
+	   }
+	   int oddDeg=0;
+	   for(int i=0;i<V;i++){
+	       if(adj[i].size()%2!=0){
+	           oddDeg++;
+	       }
+	       
+	   }
+	   if(oddDeg>2){
+	       return 0;
+	   }
+	   if(oddDeg==2){
+	       return 1;
+	   }
+	   return 2;
+	}
+};
