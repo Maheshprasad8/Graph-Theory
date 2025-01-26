@@ -1,0 +1,99 @@
+
+
+
+Code
+Testcase
+Testcase
+Test Result
+2127. Maximum Employees to Be Invited to a Meeting
+Solved
+Hard
+Topics
+Companies
+Hint
+A company is organizing a meeting and has a list of n employees, waiting to be invited. They have arranged for a large circular table,
+capable of seating any number of employees.
+
+The employees are numbered from 0 to n - 1. Each employee has a favorite person and they will attend the meeting only 
+if they can sit next to their favorite person at the table. The favorite person of an employee is not themself.
+
+Given a 0-indexed integer array favorite, where favorite[i] denotes the favorite person of the ith employee, return the maximum number of employees that can be invited to the meeting.
+
+
+Input: favorite = [2,2,1,2]
+Output: 3
+Explanation:
+The above figure shows how the company can invite employees 0, 1, and 2, and seat them at the round table.
+All employees cannot be invited because employee 2 cannot sit beside employees 0, 1, and 3, simultaneously.
+Note that the company can also invite employees 1, 2, and 3, and give them their desired seats.
+The maximum number of employees that can be invited to the meeting is 3. 
+.................................................................................................................................................
+*Step1-cycle detect
+2.Reverse the graph
+3.length of cycle
+4.if cycle==2 that happy couple wala case hai that means max len ka connected node find length krte hai'
+if no cycle (not poosible )
+
+class Solution {
+public:
+    int BFS(int start, unordered_map<int, vector<int>>& adj,
+            vector<bool>& visited) {
+        queue<pair<int, int>> q;
+        q.push({start, 0});
+        int maxDist = 0;
+        while (!q.empty()) {
+            auto [currNode, dist] = q.front();
+            q.pop();
+            for (auto& nbr : adj[currNode]) {
+                if (!visited[nbr]) {
+                    q.push({nbr, dist + 1});
+                    maxDist = max(maxDist, dist + 1);
+                }
+            }
+        }
+        return maxDist;
+    }
+    int maximumInvitations(vector<int>& favorite) {
+        int n = favorite.size();
+        unordered_map<int, vector<int>> adj;
+        for (int i = 0; i < n; i++) {
+            int u = i;
+            int v = favorite[i];
+            // reverse the graph
+            adj[v].push_back(u);
+        }
+        int longestCycle = 0;
+        int happycouple = 0;
+        vector<bool> visited(n, false);
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                unordered_map<int, int> mp;
+                int currNode = i;
+                int currNodecnt = 0;
+                while (!visited[currNode]) {
+                    visited[currNode] = true;
+                    mp[currNode] = currNodecnt;
+                    int nextNode = favorite[currNode];
+                    currNodecnt += 1;
+                    // Already visited hai,mtlabcycle detect ho gya h
+                    if (mp.count(nextNode)) {
+                        int cyclelength = currNodecnt - mp[nextNode];
+                        longestCycle = max(longestCycle, cyclelength);
+                        if (cyclelength == 2) {
+
+                            // happy couple wala case hai
+                            vector<bool> visitedNode(n, false);
+                            visitedNode[currNode] = true;
+                            visitedNode[nextNode] = true;
+                            happycouple += 2 + BFS(currNode, adj, visitedNode) +
+                                           BFS(nextNode, adj, visitedNode);
+                        }
+                        break;
+                    }
+                    currNode = nextNode;
+                }
+            }
+        }
+        return max(happycouple, longestCycle);
+    }
+};
