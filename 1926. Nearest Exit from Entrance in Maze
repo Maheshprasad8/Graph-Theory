@@ -1,0 +1,48 @@
+You are given an m x n matrix maze (0-indexed) with empty cells (represented as '.') and walls (represented as '+'). 
+You are also given the entrance of the maze, where entrance = [entrancerow, entrancecol] denotes the row and column of the cell you are initially standing at.
+
+In one step, you can move one cell up, down, left, or right. You cannot step into a cell with a wall, and you cannot step outside the maze. 
+Your goal is to find the nearest exit from the entrance. An exit is defined as an empty cell that is at the border of the maze. The entrance does not count as an exit.
+
+Return the number of steps in the shortest path from the entrance to the nearest exit, or -1 if no such path exists.
+
+ .........................................................BFS..................................................
+
+class Solution {
+public:
+    vector<vector<int>> direction = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+    int nearestExit(vector<vector<char>>& maze, vector<int>& entrance) {
+        int r = maze.size();
+        int c = maze[0].size();
+        queue<pair<int, int>> q;
+        q.push({entrance[0], entrance[1]});
+        // mark visted by makubing by +
+        maze[entrance[0]][entrance[1]] = '+';
+        int step = 0;
+        while (!q.empty()) {
+            int n = q.size();
+            while (n--) {
+                pair<int, int> temp = q.front();
+                q.pop();
+                int i = temp.first;
+                int j = temp.second;
+                if ((temp != make_pair(entrance[0], entrance[1])) &&
+                        (i == 0 || i == r - 1 ||
+                    j == 0 || j == c - 1))
+                    return step;
+                // explore the neighbour
+                for (auto& dir : direction) {
+                    int i_ = i + dir[0];
+                    int j_ = j + dir[1];
+                    if ((i_ >= 0 && i_ < r && j_ >= 0 && j_ < c) &&
+                        (maze[i_][j_] != '+')) {
+                        q.push(make_pair(i_, j_));
+                        maze[i_][j_] = '+';
+                    }
+                }
+            }
+            step++;
+        }
+        return -1;
+    }
+};
