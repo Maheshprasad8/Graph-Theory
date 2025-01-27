@@ -1,0 +1,185 @@
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where
+prerequisites[i] = [ai, bi] indicates that you must take course ai first if you want to take course bi.
+
+For example, the pair [0, 1] indicates that you have to take course 0 before you can take course 1.
+Prerequisites can also be indirect. If course a is a prerequisite of course b, and course b is a prerequisite of course c, then course a is a prerequisite of course c.
+
+You are also given an array queries where queries[j] = [uj, vj]. For the jth query, you should answer whether course uj is a prerequisite of course vj or not.
+
+Return a boolean array answer, where answer[j] is the answer to the jth query.
+
+............................................DFS.....preProcess to make grid.....................topological Sort...................
+
+class Solution {
+public:
+    bool dfs(unordered_map<int, vector<int>>& adj, int src, int dest,
+             vector<bool>& visited) {
+        // adj[u]
+        visited[src] = true;
+        if (src == dest) {
+            return true;
+        }
+        bool isreacheable = false;
+        for (auto& nbr : adj[src]) {
+            if (!visited[nbr]) {
+                // visited[nbr]=true;
+                isreacheable = isreacheable || dfs(adj, nbr, dest, visited);
+            }
+        }
+        return isreacheable;
+    }
+    vector<bool> checkIfPrerequisite(int numCourses,
+                                     vector<vector<int>>& prerequisites,
+                                     vector<vector<int>>& queries) {
+        unordered_map<int, vector<int>> adj;
+        for (auto& edge : prerequisites) {
+            int u = edge[0];
+            int v = edge[1];
+            adj[u].push_back(v);
+        }
+        int Q = queries.size();
+        vector<bool> result(Q);
+
+        for (int i = 0; i < Q; i++) {
+            int u = queries[i][0];
+            int v = queries[i][1];
+            vector<bool> visited(numCourses, false);
+            result[i] = dfs(adj, u, v, visited);
+        }
+        return result;
+    }
+};
+
+
+..................................................
+class Solution {
+public:
+    bool dfs(unordered_map<int, vector<int>>& adj, int src, int dest,
+             vector<bool>& visited) {
+        // adj[u]
+        visited[src] = true;
+        if (src == dest) {
+            return true;
+        }
+        bool isreacheable = false;
+        for (auto& nbr : adj[src]) {
+            if (!visited[nbr]) {
+                // visited[nbr]=true;
+                isreacheable = isreacheable || dfs(adj, nbr, dest, visited);
+            }
+        }
+        return isreacheable;
+    }
+    void preProcess(int n,vector<vector<bool>>&grid,unordered_map<int,vector<int>>&adj){
+        for(int u=0;u<n;u++){
+            for(int v=0;v<n;v++){
+                if(u!=v){
+                    vector<bool>visited(n,false);
+                    if(dfs(adj,u,v,visited)==true){
+                        grid[u][v]=true;
+                    }
+                }
+            }
+        }
+    }
+    vector<bool> checkIfPrerequisite(int numCourses,
+                                     vector<vector<int>>& prerequisites,
+                                     vector<vector<int>>& queries) {
+        unordered_map<int, vector<int>> adj;
+        for (auto& edge : prerequisites) {
+            int u = edge[0];
+            int v = edge[1];
+            adj[u].push_back(v);
+        }
+        vector<vector<bool>>grid(numCourses,vector<bool>(numCourses,false));
+        preProcess(numCourses,grid,adj);
+         
+        int Q = queries.size();
+        vector<bool> result(Q);
+
+        for (int i = 0; i < Q; i++) {
+            int u = queries[i][0];
+            int v = queries[i][1];
+            // vector<bool> visited(numCourses, false);
+            // result[i] = dfs(adj, u, v, visited);
+            result[i]=grid[u][v];
+        }
+        return result;
+    }
+};
+...........................................................class Solution {
+public:
+    bool dfs(unordered_map<int, vector<int>>& adj, int src, int dest,
+             vector<bool>& visited) {
+        // adj[u]
+        visited[src] = true;
+        if (src == dest) {
+            return true;
+        }
+        bool isreacheable = false;
+        for (auto& nbr : adj[src]) {
+            if (!visited[nbr]) {
+                // visited[nbr]=true;
+                isreacheable = isreacheable || dfs(adj, nbr, dest, visited);
+            }
+        }
+        return isreacheable;
+    }
+    void preProcess(int n, vector<vector<bool>>& grid,
+                    unordered_map<int, vector<int>>& adj) {
+        for (int u = 0; u < n; u++) {
+            for (int v = 0; v < n; v++) {
+                if (u != v) {
+                    vector<bool> visited(n, false);
+                    if (dfs(adj, u, v, visited) == true) {
+                        grid[u][v] = true;
+                    }
+                }
+            }
+        }
+    }
+    vector<bool> checkIfPrerequisite(int numCourses,
+                                     vector<vector<int>>& prerequisites,
+                                     vector<vector<int>>& queries) {
+        unordered_map<int, vector<int>> adj;
+        vector<int> indeg(numCourses, 0);
+        for (auto& edge : prerequisites) {
+            int u = edge[0];
+            int v = edge[1];
+            adj[u].push_back(v);
+            indeg[v]++;
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; i++) {
+            if (indeg[i] == 0) {
+                q.push(i);
+            }
+        }
+        unordered_map<int, unordered_set<int>> st;
+        while (!q.empty()) {
+            int node = q.front();
+            q.pop();
+            for (auto& ngbr : adj[node]) {
+                st[ngbr].insert(node);
+                // find the prequistics of node as well as transition,
+                // they are preq of ngbr node as well
+                for (auto& preq : st[node]) {
+                    st[ngbr].insert(preq);
+                }
+                indeg[ngbr]--;
+                if (indeg[ngbr] == 0) {
+                    q.push(ngbr);
+                }
+            }
+        }
+        int Q = queries.size();
+        vector<bool> result(Q, false);
+        for (int i = 0; i < Q; i++) {
+            int src = queries[i][0];
+            int dest = queries[i][1];
+            bool reachable = st[dest].contains(src);
+            result[i] = reachable;
+        }
+        return result;
+    }
+};
