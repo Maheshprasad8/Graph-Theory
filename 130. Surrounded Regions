@@ -1,0 +1,60 @@
+You are given an m x n matrix board containing letters 'X' and 'O', capture regions that are surrounded:
+
+Connect: A cell is connected to adjacent cells horizontally or vertically.
+Region: To form a region connect every 'O' cell.
+Surround: The region is surrounded with 'X' cells if you can connect the region with 'X' cells and none of the region cells are on the edge of the board.
+To capture a surrounded region, replace all 'O's with 'X's in-place within the original board. You do not need to return anything.
+
+.....................................DFS.............................................
+
+
+class Solution {
+public:
+    vector<vector<int>> direction = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    void dfs(vector<vector<char>>& board, int i, int j) {
+        int r = board.size();
+        int c = board[0].size();
+
+        board[i][j] = '#';
+        for (vector<int>& dir : direction) {
+            int i_ = i + dir[0];
+            int j_ = j + dir[1];
+            if (i_ >= 0 && i_ < r && j_ >= 0 && j_ < c &&
+                board[i_][j_] == 'O') {
+                dfs(board, i_, j_);
+                // board[i_][j_]='X';
+            }
+        }
+    }
+    void solve(vector<vector<char>>& board) {
+        int r = board.size();
+        int c = board[0].size();
+        //    vector<vector<bool>>vis(r,vector<bool>(c,false));
+        // mark all boundary regin
+        for (int i = 0; i < r; i++) {
+            if (board[i][0] == 'O') {
+                dfs(board, i, 0);
+            }
+            if (board[i][c - 1] == 'O') {
+                dfs(board, i, c - 1);
+            }
+        }
+        for (int j = 0; j < c; j++) {
+            if (board[0][j] == 'O') {
+                dfs(board, 0, j);
+            }
+            if (board[r - 1][j] == 'O') {
+                dfs(board, r - 1, j);
+            }
+        }
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (board[i][j] == 'O') {
+                    board[i][j] = 'X';
+                } else if (board[i][j] == '#') {
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+};
