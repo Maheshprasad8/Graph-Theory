@@ -1,0 +1,99 @@
+You are given a positive integer n representing the number of nodes in an undirected graph. The nodes are labeled from 1 to n.
+
+You are also given a 2D integer array edges, where edges[i] = [ai, bi] indicates that there is a bidirectional edge between nodes ai and bi. Notice that the given graph may be disconnected.
+
+Divide the nodes of the graph into m groups (1-indexed) such that:
+
+Each node in the graph belongs to exactly one group.
+For every pair of nodes in the graph that are connected by an edge [ai, bi], if ai belongs to the group with index x, and bi belongs to the group with index y, then |y - x| = 1.
+Return the maximum number of groups (i.e., maximum m) into which you can divide the nodes. Return -1 if it is impossible to group the nodes with the given conditions.
+
+ ..............................................BIPARTITE && BFS && LEVEL ORDER && MAXM.................................................
+
+
+class Solution {
+public:
+    bool isBipartite(unordered_map<int, vector<int>>& adj, int curr,
+                     vector<int>& color, int currcolor) {
+        color[curr] = currcolor;
+        for (int& nbr : adj[curr]) {
+            if (color[nbr] == color[curr]) {
+                return false;
+            }
+            if (color[nbr] == -1) {
+                if (isBipartite(adj, nbr, color, 1 - currcolor) == false) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    int BFS(unordered_map<int, vector<int>>& adj, int currNode, int n) {
+        queue<int> q;
+
+        vector<bool> vis(n, false);
+        q.push(currNode);
+        vis[currNode] = true;
+        int level = 1;
+        while (!q.empty()) {
+            int size = q.size();
+            while (size--) {
+                int curr = q.front();
+                q.pop();
+                for (int& nbr : adj[curr]) {
+                    if (vis[nbr])
+                        continue;
+                    q.push(nbr);
+                    vis[nbr] = true;
+                }
+            }
+            level++;
+        }
+        return level - 1;
+    }
+
+    int getMaxgrp(unordered_map<int, vector<int>>& adj, int node,
+                  vector<bool>& vis, vector<int>& level) {
+        int maxg = level[node];
+        vis[node] = true;
+        for (int& nbr : adj[node]) {
+            if (!vis[nbr]) {
+                maxg = max(maxg, getMaxgrp(adj, nbr, vis, level));
+            }
+        }
+        return maxg;
+    }
+    int magnificentSets(int n, vector<vector<int>>& edges) {
+        unordered_map<int, vector<int>> adj;
+        for (int i = 0; i < edges.size(); i++) {
+            int u = edges[i][0] - 1; // for zero based index
+            int v = edges[i][1] - 1;
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        vector<int> color(n, -1);
+        for (int node = 0; node < n; node++) {
+            if (color[node] == -1) {
+                if (isBipartite(adj, node, color, 1) == false) {
+                    return -1;
+                }
+            }
+        }
+        //  BFS krke maxm level find kro
+
+        vector<int> level(n, 0);
+        for (int node = 0; node < n; node++) {
+            level[node] = BFS(adj, node, n);
+        }
+        int maxgrp = 0;
+        vector<bool> visited(n, false);
+        for (int node = 0; node < n; node++) {
+            if (!visited[node]) {
+                maxgrp += getMaxgrp(adj, node, visited, level);
+            }
+        }
+        return maxgrp;
+    }
+};
