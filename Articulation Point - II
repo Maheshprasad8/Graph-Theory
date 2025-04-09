@@ -1,0 +1,93 @@
+ou are given an undirected graph with V vertices and E edges. The graph is represented as a 2D array edges[][], where each element edges[i] = [u, v] indicates an undirected edge between vertices u and v.
+Your task is to return all the articulation points (or cut vertices) in the graph.
+An articulation point is a vertex whose removal, along with all its connected edges, increases the number of connected components in the graph.
+
+Note: The graph may be disconnected, i.e., it may consist of more than one connected component.
+If no such point exists, return {-1}.
+
+
+...................................................................
+
+
+class Solution {
+public:
+    int timer = 0;
+
+    void dfs(int node, int parent, unordered_map<int, vector<int>>& adj,
+             vector<bool>& vis, vector<int>& tin, vector<int>& low,
+             vector<bool>& isArticulationPoint) {
+        
+        vis[node] = true;
+        tin[node] = low[node] = timer++;
+        int children = 0;
+
+        for (int nbr : adj[node]) {
+            if (nbr == parent) continue;
+            if (!vis[nbr]) {
+                dfs(nbr, node, adj, vis, tin, low, isArticulationPoint);
+                low[node] = min(low[node], low[nbr]);
+                if (low[nbr] >= tin[node] && parent != -1) {
+                    isArticulationPoint[node] = true;
+                }
+                children++;
+            } else {
+                low[node] = min(low[node], tin[nbr]);
+            }
+        }
+
+        // Special case for root node
+        if (parent == -1 && children > 1) {
+            isArticulationPoint[node] = true;
+        }
+    }
+
+    vector<int> articulationPoints(int V, vector<vector<int>>& edges) {
+        unordered_map<int, vector<int>> adj;
+        for (auto& edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        vector<bool> vis(V, false);
+        vector<int> tin(V, -1), low(V, -1);
+        vector<bool> isArticulationPoint(V, false);
+
+        for (int i = 0; i < V; ++i) {
+            if (!vis[i]) {
+                dfs(i, -1, adj, vis, tin, low, isArticulationPoint);
+            }
+        }
+
+        vector<int> result;
+        for (int i = 0; i < V; ++i) {
+            if (isArticulationPoint[i]) {
+                result.push_back(i);
+            }
+        }
+
+        if (result.empty()) return {-1};  // No articulation points
+        return result;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
