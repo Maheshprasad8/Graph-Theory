@@ -1,0 +1,40 @@
+Given a connected undirected graph represented by adjacency list, adjList[][] with n nodes,
+having a distinct label from 0 to n-1, where each adj[i] represents the list of vertices connected to vertex i.
+
+Create a clone of the graph, where each node in the graph contains an integer val and an array (neighbors) of nodes, 
+containing nodes that are adjacent to the current node.
+
+.................................................
+
+
+
+class Solution {
+  public:
+    Node* cloneGraph(Node* node) {
+      
+      if(!node){
+          return NULL;
+      }
+      map<Node* , Node*>mp;
+      queue<Node*>q;
+      Node* clone=new Node();
+      clone->val=node->val;
+      mp[node]=clone;
+      q.push(node);
+      while(!q.empty()){
+          Node* u=q.front();
+          q.pop();
+          for(auto nbr:u->neighbors){
+              if(mp.find(nbr)==mp.end()){
+                  Node* nbrclone=new Node();
+                  nbrclone->val=nbr->val;
+                  mp[nbr]=nbrclone;
+                  q.push(nbr);
+                  
+              }
+              mp[u]->neighbors.push_back(mp[nbr]);
+          }
+      }
+        return mp[node];
+    }
+};
